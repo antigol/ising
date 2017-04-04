@@ -35,7 +35,9 @@ impl State {
             }
             energy += self.spins[i] as f64 * sum;
         }
-        energy / 2.0
+        // feromagnetic
+        // energy = - sum J s_i s_j
+        -energy / 2.0
     }
 
     pub fn sweep(&mut self, temp: f64, nns: &Vec<(f64, Vec<Vec<usize>>)>) -> f64 {
