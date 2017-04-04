@@ -1,0 +1,12 @@
+[package]
+name = "ising"
+version = "0.1.0"
+authors = ["Mario Geiger <geiger.mario@gmail.com>"]
+
+[lib]
+name = "ising"
+crate-type = ["cdylib"]
+
+[dependencies]
+rand = "0.3"
+cpython = { git = "https://github.com/dgrunwald/rust-cpython" }
