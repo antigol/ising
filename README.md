@@ -8,7 +8,10 @@ Interface with Python via a class `Hamiltonian`.
 - energy computation
 
 ## What is coded in Python
-The neighbour and next neighbour lists are computed in Python then used to create a `Hamiltonian` instance.
+The neighbor and next neighbor lists are computed in Python then used to create a `Hamiltonian` instance.
+
+- determine the Neighbors
+- parallel tempering
 
 ## To run
 

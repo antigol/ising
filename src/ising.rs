@@ -24,18 +24,27 @@ py_class!(class Hamiltonian |py| {
     }
 });
 
-fn energy(py: Python, state: &PyObject, nn: &Vec<(f64, Vec<Vec<usize>>)>) -> PyResult<f64> {
-    let state = PyBuffer::get(py, state)?;
-    let state = State::from_pybuffer(py, &state)?;
-    Ok(state.compute_energy(nn))
+fn energy(py: Python, state: &PyObject, nns: &Vec<(f64, Vec<Vec<usize>>)>) -> PyResult<f64> {
+    let state_buffer = PyBuffer::get(py, state)?;
+
+    // Python -> Rust : load state content into a State object
+    let state = State::from_pybuffer(py, &state_buffer)?;
+
+    Ok(state.compute_energy(nns))
 }
 
 fn sweep(py: Python, state: &PyObject, temp: f64, nns: &Vec<(f64, Vec<Vec<usize>>)>) -> PyResult<f64> {
     let state_buffer = PyBuffer::get(py, state)?;
+
+    // Python -> Rust : load state content into a State object
     let mut state = State::from_pybuffer(py, &state_buffer)?;
-    let mut delta_energy = 0.0;
-    py.allow_threads(|| { delta_energy = state.sweep(temp, nns); });
+
+    // perform the sweep in a manner that allow the multiprocessing
+    let delta_energy = py.allow_threads(|| { state.sweep(temp, nns) });
+
+    // Python <- Rust : put the new state into the buffer
     state.copy_to_pybuffer(py, &state_buffer)?;
+
     Ok(delta_energy)
 }
 

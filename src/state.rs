@@ -43,15 +43,10 @@ impl State {
     pub fn sweep(&mut self, temp: f64, nns: &Vec<(f64, Vec<Vec<usize>>)>) -> f64 {
         let mut delta_energy = 0f64;
 
-        // let mut probas: Vec<f64> = Vec::new();
-        // let max_nn = max_nn as i32;
-        // for nei in -max_nn..max_nn + 1 {
-        //     probas.push(f64::exp(- 2.0 * nei as f64 / temp));
-        // }
-
         for _ in 0..self.spins.len() {
             delta_energy += self.try_flip(temp, nns);
         }
+
         delta_energy
     }
 
@@ -60,16 +55,19 @@ impl State {
 
         let i = Range::new(0, self.spins.len()).ind_sample(&mut rng);
 
+        // feromagnetic
+        // energy = - sum_<ik> J s_i s_k
+        // d_e =  energy_new(s_i flipped)    -  energy_old
+        // d_e = (- (-s_i) * sum_<ik> J s_k) - (- s_i * sum_<ik> J s_k)
+        // d_e = 2 * s_i * sum_<ik> J s_k
+
         let mut nei = 0f64;
         for &(j, ref nn) in nns.iter() {
             for &k in nn[i].iter() {
                 nei += j * self.spins[k] as f64;
             }
         }
-        // feromagnetic
-        // energy = - sum s_i s_j
-        // d_e = energy_new - energy_old
-        // d_e = 2 * spins[i] * nei
+
         let d_e = 2.0 * self.spins[i] as f64 * nei;
 
         if rng.next_f64() < f64::exp(- d_e / temp) {
